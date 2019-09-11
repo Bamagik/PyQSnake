@@ -48,14 +48,14 @@ class App:
         self._apple_surf = pygame.Surface((10,10))
         self._apple_surf.fill((0,255,0))
 
-        return get_observations()
+        return self.get_observations()
 
     def get_observations(self):
-        observs = np.zeros((self.window_width, self.window_height))
-        observs[self.apple.x, self.apple.y] = 1
+        observs = np.zeros((self.window_width//STEP, self.window_height//STEP))
+        observs[self.apple.x//STEP, self.apple.y//STEP] = 1
         
         for i in range(1,self.player.length):
-            observs[self.player.x[i], self.player.y[i]] = -1
+            observs[self.player.x[i]//STEP, self.player.y[i]//STEP] = -1
 
         return observs
 
@@ -113,9 +113,7 @@ class App:
             self.running = False
 
     def on_execute(self):
-        if self.on_init() == False:
-            self.running = False
-        
+        self.on_init()
         while self.running:
             pygame.event.pump()
             keys = pygame.key.get_pressed()
@@ -136,13 +134,13 @@ if __name__ == "__main__":
     tf.reset_default_graph()
     # set up... might not be correct yet
     inputs1 = tf.placeholder(shape=[1,60*60], dtype=tf.float32)
-    W = tf.Variable(tf.random_uniform([60,60], 0, 0.01))
+    W = tf.Variable(tf.random_uniform([60*60,4], 0, 0.01))
     Qout = tf.matmul(inputs1, W)
-    predict = tf.argsmax(Qout, 1)
+    predict = tf.argmax(Qout, 1)
     # loss function set up
     nextQ = tf.placeholder(shape=[1,4], dtype=tf.float32)
-    loss = td.reduce_sum(tf.square(nextQ - Qout))
-    trainer = tf.trian.GradientDescentOptimizer(learning_rate=0.1)
+    loss = tf.reduce_sum(tf.square(nextQ - Qout))
+    trainer = tf.train.GradientDescentOptimizer(learning_rate=0.1)
     updateModel = trainer.minimize(loss)
 
     init = tf.initialize_all_variables()
