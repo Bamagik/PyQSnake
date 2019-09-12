@@ -1,15 +1,13 @@
 from utils import STEP
 
 class Player:
-    x = [0]
-    y = [0]
     direction = 0
-    length = 3
-
     update_count_max = 2
     update_count = 0
 
     def __init__(self, length, screen_size):
+        self.x = [0]
+        self.y = [0]
         self.length = length
         for i in range(0, screen_size):
             self.x.append(0)
